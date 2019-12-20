@@ -95,7 +95,6 @@ document.addEventListener('input', handleCheckbox, false)
 
 app.render();
 
-Reef.debug(true);
 
 
 })();
