@@ -1,0 +1,22 @@
+body {
+    margin: auto;
+    max-width: 33rem;
+    text-align: center;
+}
+
+p {
+    margin-top: 2rem;
+}
+
+.complete {
+    text-decoration: line-through;
+}
+
+li {
+    list-style: none;
+
+}
+
+li>input {
+    margin-left: 1rem;
+}
