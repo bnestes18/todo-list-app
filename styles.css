@@ -1,15 +1,18 @@
 body {
     margin: auto;
     max-width: 33rem;
-    text-align: center;
 }
 
 p {
     margin-top: 2rem;
 }
 
-.complete {
+.todo-completed {
     text-decoration: line-through;
+}
+
+ul {
+    padding: 0;
 }
 
 li {
@@ -17,6 +20,6 @@ li {
 
 }
 
-li>input {
-    margin-left: 1rem;
+input[type="checkbox"] {
+    margin-right: .5rem;
 }

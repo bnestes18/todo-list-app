@@ -1,92 +1,88 @@
 ;(function() {
+
+    "use strict";
+
     // VARIABLES
 
-let newTodo = document.querySelector('#new-todo')
+// The new todo input field
+let newTodo = document.querySelector('#new-todo');
 
 // COMPONENT
 let app = new Reef('#app', {
     // properties of app 'props'
     data: {
-        listItems: []
+        todos: []
     },
     template: function (props) {
-    
-        let html = (props.listItems.length < 1) ? '<p>There are no items in the list</p>' :
-        '<ul>' + props.listItems.map(function (item) {
-                        return  '<li>' + item.todo + '<input type="checkbox" value="completed" name="completed">' + '</li>'
-        }).join('') + '</ul>'
+        // If todos array is empty, return a generic message to prompt user to add a todo item
+        if (props.todos.length < 1) {
+            return '<p>There are no items in the list.  Add a todo item using the form above.</p>'
+        } 
+        // Otherwise, render the list of todo items
+        return '<ul class="todos">' + props.todos.map(function (todo, index) {
+                            let todoHTML = 
+                            '<li ' + (todo.completed ? 'class="todo-completed"' : '') + '>' + 
+                                '<label for="todo-' + index + '">' + 
+                                    '<input type="checkbox" id="todo-' + index 
+                                    + '" data-todo="' + index + '" ' + (todo.completed ? 'checked' : '') + '>' + todo.item +
+                                '</label>' +
+                            '</li>';
+                            return todoHTML;
 
-        return html;
+            }).join('') + '</ul>'
+        
     }
     
 })
 // FUNCTIONS
 
 let addTodo = function(e) {
-    // if the button clicked is not part of the form
+    // If the button clicked is not part of the form,
+    // stop running the callback function
     if (!e.target.closest('#add-todos')) return;
-    // If the input element or input element value 
-    //does not exist, stop running the function
-    if (!newTodo || !newTodo.value) return;
 
     // Prevent the form from submitting
     e.preventDefault();
+
+    // If the input element value is empty, 
+    // stop running the function
+    if (newTodo.value.length < 1) return;
+
     // Get an immutable copy of the 'data' object and 
     // update the array with the new listItem
-    let items = app.getData();
-    items.listItems.push({todo: newTodo.value, completed: false});
-    app.setData({listItems: items.listItems});
+    let items = app.getData().todos;
+
+    // Update the 
+    items.push({
+        item: newTodo.value, 
+        completed: false
+    });
+
+    app.setData({todos: items});
     // Clear the input text field
     newTodo.value = "";
+    newTodo.focus();
 
 }
-/*
-This function will update the complete property for each todo to true
-*/
-let updateComplete = function () {
-    
-    app.data.listItems.map(function (listItem) {
-        // console.log('listItemBefore', listItem);
-        listItem.completed = true;
-        // console.log('listItemAfter', listItem);
-    // app.setData({listItems: items.listItems})
-    // console.log('app', app.data.listItems)
-    })
-}
-/*
-This function will update the complete property for each todo to false
-*/
-let updateNotComplete = function () {
-    app.data.listItems.map(function (listItem) {
-        // console.log('listItemBefore', listItem);
-        listItem.completed = false;
-        // console.log('listItemAfter', listItem);
-    // app.setData({listItems: items.listItems})
-    // console.log('app', app.data.listItems)
-    })
-}
-
 
 let handleCheckbox = function(e) {
     
-    // Select the checkboxes in the unordered list
-    let checkBoxes = Array.prototype.slice.call(document.querySelectorAll('li > input'));
+    // Get attribute of the clicked target. If target
+    // does not have the 'data-todo'attribute, stop 
+    // running the callback function
+    let todo = e.target.getAttribute('data-todo');
+    if (!todo) return;
 
-    if (!checkBoxes) return;
+    // Get an immutable copy of the 'data' object.
+    // If the clicked todo item doesn't have an index,
+    // stop running the callback function
+    let items = app.getData().todos;
+    if (!items[todo]) return;
 
-    checkBoxes.map(function (checkBox) {
-        // If checkbox is checked, add a 'strikethrough' effect to the text
-        // and update the complete property of the todo item to true
-        if (checkBox.checked) {
-            checkBox.parentNode.classList.add("complete");
-            updateComplete();
-        } else {
-            // Otherwise, remove the 'strikethrough' effect and
-            // update the complete property of the todo item to true
-            checkBox.parentNode.classList.remove("complete");
-            updateNotComplete();
-        }
-    })
+    items[todo].completed = e.target.checked;
+
+    app.setData({todos: items});
+
 
 }
 
