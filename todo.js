@@ -6,6 +6,7 @@
 
 // The new todo input field
 let newTodo = document.querySelector('#new-todo');
+let storageId = 'save-todos';
 
 // COMPONENT
 let app = new Reef('#app', {
@@ -26,7 +27,7 @@ let app = new Reef('#app', {
                                     '<input type="checkbox" id="todo-' + index 
                                     + '" data-todo="' + index + '" ' + (todo.completed ? 'checked' : '') + '>' + todo.item +
                                 '</label>' +
-                            '</li>';
+                            '</li>' + ' <a href="#" data-delete="' + index + '">Delete</a>';
                             return todoHTML;
 
             }).join('') + '</ul>'
@@ -52,24 +53,73 @@ let addTodo = function(e) {
     // update the array with the new listItem
     let items = app.getData().todos;
 
-    // Update the 
+    // Update the immutable copy
     items.push({
         item: newTodo.value, 
-        completed: false
+        completed: false,
     });
 
+    // Render a fresh UI
     app.setData({todos: items});
+
     // Clear the input text field
     newTodo.value = "";
     newTodo.focus();
 
+    // Save the todos to localStorage
+    saveTodos();
+
+}
+
+let deleteTodo = function (e) {
+    // Get attribute value (index) of the clicked target. 
+    // If target does not have the 'data-todo'attribute, 
+    // stop running the callback function
+    let todo = e.target.getAttribute('data-delete');
+    if (!todo) return;
+
+    // Get an immutable copy of the 'data' object
+    let items = app.getData().todos;
+
+    // Delete the specific item
+    items.splice(items[todo], 1);
+
+    // Render a fresh UI
+    app.setData({todos: items})
+
+    // Save the todos to localStorage
+    saveTodos();
+    
+}
+
+let loadTodos = function () {
+    // Get the saved storage data
+    let saved = localStorage.getItem(storageId);
+
+    // If there is no saved data, stop running the function
+    if (!saved) return;
+    // Otherwise, convert the data into an array
+    saved = JSON.parse(saved);
+
+    // Set the saved data to the 'data' object and render fresh UI
+    app.setData({todos: saved});
+}
+
+let saveTodos = function () {
+
+    if (app.innerHTML === app.render()) return;
+
+    // Get immutable copy of todos
+    let items = app.getData().todos;
+    // Save the todos to localStorage
+    localStorage.setItem(storageId, JSON.stringify(items))
 }
 
 let handleCheckbox = function(e) {
     
-    // Get attribute of the clicked target. If target
-    // does not have the 'data-todo'attribute, stop 
-    // running the callback function
+    // Get attribute value (index) of the clicked target. 
+    // If target does not have the 'data-todo' attribute, 
+    // stop running the callback function
     let todo = e.target.getAttribute('data-todo');
     if (!todo) return;
 
@@ -83,14 +133,19 @@ let handleCheckbox = function(e) {
 
     app.setData({todos: items});
 
+    saveTodos();
+
+    
+
 
 }
 
 document.addEventListener('submit', addTodo, false)
 document.addEventListener('input', handleCheckbox, false)
+document.addEventListener('click', deleteTodo, false)
 
 app.render();
 
-
+loadTodos();
 
 })();

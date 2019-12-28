@@ -17,9 +17,14 @@ ul {
 
 li {
     list-style: none;
-
+    display: inline;
+}
+a::after {
+    content: "";
+    display: block;
 }
 
 input[type="checkbox"] {
     margin-right: .5rem;
+    display: inline;
 }
