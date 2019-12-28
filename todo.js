@@ -6,6 +6,7 @@
 
 // The new todo input field
 let newTodo = document.querySelector('#new-todo');
+// The local storage ID
 let storageId = 'save-todos';
 
 // COMPONENT
@@ -27,7 +28,7 @@ let app = new Reef('#app', {
                                     '<input type="checkbox" id="todo-' + index 
                                     + '" data-todo="' + index + '" ' + (todo.completed ? 'checked' : '') + '>' + todo.item +
                                 '</label>' +
-                            '</li>' + ' <a href="#" data-delete="' + index + '">Delete</a>';
+                            '</li>' + ' <a href="#" data-delete="' + index + '" aria-label="Delete ' +  todo.item + '">Delete</a>';
                             return todoHTML;
 
             }).join('') + '</ul>'
@@ -37,6 +38,10 @@ let app = new Reef('#app', {
 })
 // FUNCTIONS
 
+/*
+This function will add a new todo item to the list in the event
+that the submit button is clicked
+*/
 let addTodo = function(e) {
     // If the button clicked is not part of the form,
     // stop running the callback function
@@ -67,10 +72,13 @@ let addTodo = function(e) {
     newTodo.focus();
 
     // Save the todos to localStorage
-    saveTodos();
+    // saveTodos();
 
 }
-
+/*
+This function will delete a todo item in the event that the 
+delete button is clicked
+*/
 let deleteTodo = function (e) {
     // Get attribute value (index) of the clicked target. 
     // If target does not have the 'data-todo'attribute, 
@@ -80,43 +88,46 @@ let deleteTodo = function (e) {
 
     // Get an immutable copy of the 'data' object
     let items = app.getData().todos;
+    // Check if todo item exists
+    if (!items[todo]) return;
+
+    // Confirm with the user before deleting
+    if (!window.confirm('Are you sure you want to delete this todo item?  This cannot be undone.')) return
 
     // Delete the specific item
-    items.splice(items[todo], 1);
+    items.splice(todo, 1);
 
     // Render a fresh UI
     app.setData({todos: items})
-
-    // Save the todos to localStorage
-    saveTodos();
     
 }
-
+/*
+This function will load the list of saved todo items
+*/
 let loadTodos = function () {
     // Get the saved storage data
     let saved = localStorage.getItem(storageId);
 
     // If there is no saved data, stop running the function
-    if (!saved) return;
-    // Otherwise, convert the data into an array
-    saved = JSON.parse(saved);
+    let data = saved ? JSON.parse(saved) : { todos: [] };
 
     // Set the saved data to the 'data' object and render fresh UI
-    app.setData({todos: saved});
+    app.setData(data);
 }
-
+/*
+This function will save the list of todo items to localStorage
+*/
 let saveTodos = function () {
-
-    if (app.innerHTML === app.render()) return;
-
     // Get immutable copy of todos
-    let items = app.getData().todos;
+    let data = app.getData();
     // Save the todos to localStorage
-    localStorage.setItem(storageId, JSON.stringify(items))
+    localStorage.setItem(storageId, JSON.stringify(data))
 }
-
-let handleCheckbox = function(e) {
-    
+/*
+This function will mark any todo item as complete in the
+event that the todo's checkbox is checked
+*/
+let completeTodo = function (e) {
     // Get attribute value (index) of the clicked target. 
     // If target does not have the 'data-todo' attribute, 
     // stop running the callback function
@@ -132,20 +143,30 @@ let handleCheckbox = function(e) {
     items[todo].completed = e.target.checked;
 
     app.setData({todos: items});
+}
 
-    saveTodos();
-
-    
-
+let handleCheckbox = function(e) {
+    // Mark the todo as complete
+    completeTodo(e);
 
 }
 
-document.addEventListener('submit', addTodo, false)
-document.addEventListener('input', handleCheckbox, false)
-document.addEventListener('click', deleteTodo, false)
-
-app.render();
-
+// Load the todos on initial render
 loadTodos();
+
+// EVENT LISTENERS
+
+// Listens for the submit event of the form
+document.addEventListener('submit', addTodo, false);
+
+// Listens for any input events on the checkboxes
+document.addEventListener('input', handleCheckbox, false);
+
+// Listens for any click events on the Delete link
+document.addEventListener('click', deleteTodo, false);
+
+// Listens for any render events when when the UI has been updated
+document.addEventListener('render', saveTodos, false);
+
 
 })();
