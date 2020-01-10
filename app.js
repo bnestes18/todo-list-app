@@ -4,7 +4,8 @@
         "use strict"
 
         // VARIABLES
-        let app, field;
+        let app;
+        let field;
 
         // The local storage ID
         let storageId = 'route-todos';
@@ -34,7 +35,7 @@
 
                     // If the list does not exist, show a message and link back to all lists
                     if (!list) {
-                        return '<h1>This list could not be found, sorry!</h1>';
+                        return link + '<h1>This list could not be found, sorry!</h1>';
                     }
 
 
@@ -148,7 +149,7 @@
             // Define the field variable
             // This will match against EITHER #new-list OR #new-todo, whichever it finds first
             // This prevents me from having to conditionally st my selector
-            field = document.querySelector('#new-list', '#new-todo');
+            field = document.querySelector('#new-list, #new-todo');
             
         }
 
@@ -208,6 +209,8 @@
                 // Get an immutable copy of the 'data' object and 
                 // update the array with the new listItem
                 let data = app.getData();
+
+                console.log(data.lists)
 
                 let list = data.lists[data.current];
                 if (!list) return;
