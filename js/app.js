@@ -44,9 +44,11 @@
                         '<h1>' + list.name + '</h1>' +
 
                         '<form id="add-todos">' +
-                        '<label for="new-todo">What do you want to do? </label>' +
-                        '<input type="text" id="new-todo" autofocus>' +
-                        '<button>Add Todo</button>' +
+                            '<label for="new-todo">What do you want to do? </label>' +
+                            '<input type="text" id="new-todo" autofocus placeholder="Name your to-do here">' +
+                            '<button class="btn waves-effect waves-light btn-small" name="action" type="submit">' + 'Add Todo' + 
+                                '<i class="material-icons right">send</i>' + 
+                            '</button>' +
                         '</form>';
                     // If todos array is empty, return a generic message to prompt user to add a todo item
                     if (list.todos.length < 1) {
@@ -55,12 +57,14 @@
                     // Otherwise, return the form and list of todo items
                     return form + '<ul class="todos">' + list.todos.map(function (todo, index) {
                         let todoHTML =
-                            '<li ' + (todo.completed ? 'class="todo-completed"' : '') + '>' +
-                            '<label for="todo-' + index + '">' +
-                            '<input type="checkbox" id="todo-' + index +
-                            '" data-todo="' + index + '" ' + (todo.completed ? 'checked' : '') + '>' + todo.item +
-                            '</label>' +
-                            '</li>' + ' <a href="#" data-delete-todo="' + index + '" aria-label="Delete ' + todo.item + '">Delete</a>';
+                            '<li class="todo-list-item">' +
+                                '<label for="todo-' + index + '" >' +
+                                '<input type="checkbox" class="filled-in" id="todo-' + index +
+                                '" data-todo="' + index + '" ' + (todo.completed ? 'checked' : '') + '>' + 
+                                '<span ' + (todo.completed ? 'class="todo-completed"' : '') + '>' + todo.item + '</span>' +
+                                '</label>' + 
+                                ' <a class="delete-todo btn waves-effect waves-light btn-small" href="#" data-delete-todo="' + index + '" aria-label="Delete ' + todo.item + '">Delete</a>' +
+                            '</li>' 
                         return todoHTML;
 
                     }).join('') + '</ul>'
@@ -89,9 +93,10 @@
                         '<h1>My Lists</h1>' +
 
                         '<form id="add-list">' +
-                        '<label for="new-list">What kind of list would you like to create? </label>' +
-                        '<input type="text" id="new-list" autofocus>' +
-                        '<button>Add New List</button>' +
+                            '<label for="new-list">What kind of list would you like to create? </label>' +
+                            '<input type="text" id="new-list" autofocus placeholder="Name of the list goes here">' +
+                            '<button id="submit" class="btn waves-effect waves-light btn-small" name="action" type="submit">' + 'Add New List' + 
+                            '<i class="material-icons right">send</i>' + '</button>' +
                         '</form>';
                     // If todos array is empty, return a generic message to prompt user to add a todo item
                     if (props.lists.length < 1) {
@@ -100,9 +105,9 @@
                     // Otherwise, return the form and list of todo items
                     return form + '<ol class="lists">' + props.lists.map(function (list, index) {
                         let todoHTML =
-                            '<li>' +
+                            '<li class="list-list-item">' +
                             '<a href="?list=' + index + '">' + list.name + ' (' + list.todos.length + ')</a>' +
-                            '<button data-delete-list="' + index + '" aria-label="Delete ' + list.name + '">Delete</button>' +
+                            '<button class="waves-effect waves-light btn-small" data-delete-list="' + index + '" aria-label="Delete ' + list.name + '">Delete</button>' +
                             '</li>';
                         return todoHTML;
 
@@ -209,8 +214,6 @@
                 // Get an immutable copy of the 'data' object and 
                 // update the array with the new listItem
                 let data = app.getData();
-
-                console.log(data.lists)
 
                 let list = data.lists[data.current];
                 if (!list) return;
